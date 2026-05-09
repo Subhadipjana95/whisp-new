@@ -66,6 +66,23 @@ export function useRecorder(): UseRecorderReturn {
 
   const start = useCallback(async () => {
     try {
+      const { status: existingStatus } = await Audio.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Audio.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== 'granted') {
+        const message = finalStatus === 'denied' 
+          ? 'Microphone access was denied. Please enable it in your device settings to record voice notes.' 
+          : 'Missing audio recording permissions.';
+        
+        // We use a console error here as well for logging
+        console.error('[useRecorder.start]', message);
+        throw new Error(message);
+      }
+
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,

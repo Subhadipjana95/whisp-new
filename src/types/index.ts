@@ -48,8 +48,6 @@ export interface ParsedTranscriptResult {
 
 export interface AppSettings {
   theme: ThemeMode;
-  openAiApiKey: string;
-  anthropicApiKey: string;
   defaultReminderSound: boolean;
   hapticFeedback: boolean;
 }

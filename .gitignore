@@ -31,6 +31,7 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
 
 # typescript
@@ -44,5 +45,7 @@ app-example
 
 
 # Prompts
-
 Prompts.md
+
+# Designs
+Design.md

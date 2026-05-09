@@ -19,8 +19,8 @@ export async function requestAllPermissions(): Promise<PermissionResult> {
     microphone: false,
   };
 
-  // Notifications (physical device only)
-  if (Device.isDevice) {
+  // Notifications
+  try {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
@@ -29,21 +29,17 @@ export async function requestAllPermissions(): Promise<PermissionResult> {
     }
     results.notifications = finalStatus === 'granted';
 
-    if (Platform.OS === 'android') {
+    if (results.notifications && Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('reminders', {
         name: 'Reminders',
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#6366f1',
-        sound: 'reminder_alarm.wav',
+        lightColor: '#5e6ad2',
         lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
-        bypassDnd: false,
-        enableLights: true,
-        enableVibrate: true,
       });
     }
-  } else {
-    console.warn('[Permissions] Push notifications require a physical device');
+  } catch (err) {
+    console.error('[Permissions] Notification permission error:', err);
   }
 
   // Camera
@@ -55,8 +51,13 @@ export async function requestAllPermissions(): Promise<PermissionResult> {
   results.mediaLibrary = mediaStatus === 'granted';
 
   // Microphone
-  const { status: micStatus } = await Audio.requestPermissionsAsync();
-  results.microphone = micStatus === 'granted';
+  const { status: existingMicStatus } = await Audio.getPermissionsAsync();
+  let finalMicStatus = existingMicStatus;
+  if (existingMicStatus !== 'granted' && existingMicStatus !== 'denied') {
+    const { status } = await Audio.requestPermissionsAsync();
+    finalMicStatus = status;
+  }
+  results.microphone = finalMicStatus === 'granted';
 
   return results;
 }

@@ -1,45 +1,41 @@
-import { File } from 'expo-file-system';
-import Constants from 'expo-constants';
-import { useSettingsStore } from '../stores/settingsStore';
 
-const WHISPER_ENDPOINT = 'https://api.openai.com/v1/audio/transcriptions';
+const GROQ_AUDIO_ENDPOINT = 'https://api.groq.com/openai/v1/audio/transcriptions';
 
 export async function transcribeAudio(audioUri: string): Promise<string> {
-  const apiKey =
-    process.env.EXPO_PUBLIC_OPENAI_API_KEY ||
-    useSettingsStore.getState().openAiApiKey;
+  const apiKey = process.env.EXPO_PUBLIC_GROQ_API_KEY;
 
   if (!apiKey || apiKey.length < 10) {
     throw new Error(
-      'OpenAI API key is not configured. Add EXPO_PUBLIC_OPENAI_API_KEY to your .env file or set it in Settings.'
+      'Groq API key is not configured. Add EXPO_PUBLIC_GROQ_API_KEY to your .env file.'
     );
   }
 
-  const file = new File(audioUri);
-  if (!file.exists) {
-    throw new Error(`Audio file not found at: ${audioUri}`);
-  }
-
-  // Read file as blob for fetch upload
-  const fileBlob = file as unknown as Blob;
-
+  // Create form data for multipart upload
   const formData = new FormData();
-  formData.append('file', fileBlob, 'recording.m4a');
-  formData.append('model', 'whisper-1');
-  formData.append('language', 'en');
+  
+  // In React Native with fetch, we can use an object with uri, name, and type for files
+  formData.append('file', {
+    uri: audioUri,
+    name: 'recording.m4a',
+    type: 'audio/m4a',
+  } as any);
+  
+  formData.append('model', 'whisper-large-v3-turbo');
   formData.append('response_format', 'json');
+  formData.append('temperature', '0');
 
-  const response = await fetch(WHISPER_ENDPOINT, {
+  const response = await fetch(GROQ_AUDIO_ENDPOINT, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      'Authorization': `Bearer ${apiKey}`,
+      'Accept': 'application/json',
     },
     body: formData,
   });
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error('[Transcription] Whisper API error:', errorBody);
+    console.error('[Transcription] Groq API error:', errorBody);
     throw new Error(`Transcription failed: HTTP ${response.status}`);
   }
 

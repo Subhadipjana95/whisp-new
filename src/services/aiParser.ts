@@ -1,9 +1,8 @@
-import Constants from 'expo-constants';
-import { useSettingsStore } from '../stores/settingsStore';
 import type { ParsedTranscriptResult } from '../types';
 
-const CLAUDE_ENDPOINT = 'https://api.anthropic.com/v1/messages';
-const MODEL = 'claude-sonnet-4-20250514';
+const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY;
+const MODEL = 'llama-3.3-70b-versatile';
 
 const SYSTEM_PROMPT = `You are a voice note parser. Your job is to analyze a voice-recorded transcript and extract structured data.
 
@@ -23,46 +22,38 @@ RULES:
 - Remove filler words (um, uh, like, you know) from the body`;
 
 export async function parseTranscript(transcript: string): Promise<ParsedTranscriptResult> {
-  const apiKey =
-    process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY ||
-    useSettingsStore.getState().anthropicApiKey;
-
-  if (!apiKey || apiKey.length < 10) {
-    throw new Error(
-      'Anthropic API key is not configured. Add EXPO_PUBLIC_ANTHROPIC_API_KEY to your .env file or set it in Settings.'
-    );
-  }
-
   const now = new Date();
   const userMessage = `Today is ${now.toISOString()}. Parse this transcript:\n\n"${transcript}"`;
 
-  const response = await fetch(CLAUDE_ENDPOINT, {
+  const response = await fetch(GROQ_ENDPOINT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
     },
     body: JSON.stringify({
       model: MODEL,
-      max_tokens: 512,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: userMessage }],
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: userMessage }
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.1,
     }),
   });
 
   if (!response.ok) {
     const body = await response.text();
-    console.error('[aiParser] Claude API error:', response.status, body);
-    throw new Error(`Claude API error: HTTP ${response.status}`);
+    console.error('[aiParser] Groq API error:', response.status, body);
+    throw new Error(`Groq API error: HTTP ${response.status}`);
   }
 
   const data = await response.json() as {
-    content: Array<{ type: string; text: string }>;
+    choices: Array<{ message: { content: string } }>;
   };
 
-  const rawText = data.content.find((b) => b.type === 'text')?.text;
-  if (!rawText) throw new Error('No text content in Claude response');
+  const rawText = data.choices[0]?.message?.content;
+  if (!rawText) throw new Error('No content in Groq response');
 
   try {
     const parsed = JSON.parse(rawText.trim()) as ParsedTranscriptResult;

@@ -21,7 +21,7 @@ export async function setupNotifications(): Promise<void> {
   await Notifications.setNotificationCategoryAsync(REMINDER_CATEGORY_ID, [
     {
       identifier: 'MARK_DONE',
-      buttonTitle: '✅ Done',
+      buttonTitle: 'Done',
       options: {
         isDestructive: false,
         isAuthenticationRequired: false,
@@ -30,7 +30,7 @@ export async function setupNotifications(): Promise<void> {
     },
     {
       identifier: 'SNOOZE',
-      buttonTitle: '⏰ Snooze 10 min',
+      buttonTitle: 'Snooze 10 min',
       options: {
         isDestructive: false,
         isAuthenticationRequired: false,
@@ -47,26 +47,31 @@ export async function scheduleReminder(reminder: Pick<Reminder, 'id' | 'title' |
     throw new Error('Cannot schedule a notification in the past');
   }
 
-  const notificationId = await Notifications.scheduleNotificationAsync({
-    content: {
-      title: `⏰ ${reminder.title}`,
-      body: reminder.body || 'Reminder',
-      sound: 'reminder_alarm.wav',
-      categoryIdentifier: REMINDER_CATEGORY_ID,
-      data: { reminderId: reminder.id, type: 'reminder' },
-      ...(Platform.OS === 'android' && {
-        channelId: 'reminders',
-        color: '#6366f1',
-        priority: Notifications.AndroidNotificationPriority.MAX,
-      }),
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DATE,
-      date: dueDate,
-    },
-  });
+  try {
+    const notificationId = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: `⏰ ${reminder.title}`,
+        body: reminder.body || 'Reminder',
+        categoryIdentifier: REMINDER_CATEGORY_ID,
+        data: { reminderId: reminder.id, type: 'reminder' },
+        ...(Platform.OS === 'android' && {
+          channelId: 'reminders',
+          color: '#5e6ad2',
+          priority: Notifications.AndroidNotificationPriority.MAX,
+        }),
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: dueDate,
+      },
+    });
 
-  return notificationId;
+    console.log(`[Notifications] Scheduled: "${reminder.title}" at ${dueDate.toLocaleString()} (ID: ${notificationId})`);
+    return notificationId;
+  } catch (error) {
+    console.error('[Notifications] Schedule failed:', error);
+    throw error;
+  }
 }
 
 export async function cancelNotification(notificationId: string): Promise<void> {

@@ -52,9 +52,8 @@
       [
         "expo-notifications",
         {
-          "sounds": ["./assets/sounds/reminder_alarm.wav"],
           "icon": "./assets/images/icon.png",
-          "color": "#6366f1"
+          "color": "#5e6ad2"
         }
       ],
       [
@@ -64,8 +63,7 @@
       "expo-sqlite"
     ],
     "extra": {
-      "openAiKey": "process.env.EXPO_PUBLIC_OPENAI_API_KEY",
-      "anthropicKey": "process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY"
+      "groqKey": "process.env.EXPO_PUBLIC_GROQ_API_KEY"
     },
     "experiments": {
       "typedRoutes": true,

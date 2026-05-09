@@ -25,28 +25,28 @@ export const ConfirmDialog = memo(function ConfirmDialog({
   return (
     <Modal transparent animationType="fade" visible={visible} onRequestClose={onCancel}>
       <Pressable
-        className="flex-1 bg-black/50 items-center justify-center px-8"
+        className="flex-1 bg-black/60 items-center justify-center px-8"
         onPress={onCancel}
       >
-        <Pressable className="bg-white dark:bg-gray-800 rounded-3xl p-6 w-full max-w-sm">
+        <Pressable className="bg-white dark:bg-neutral-900 rounded-xl p-6 w-full max-w-sm border border-white/10">
           <Text className="text-xl font-bold text-gray-900 dark:text-white mb-2">{title}</Text>
-          <Text className="text-base text-gray-500 dark:text-gray-400 mb-6">{message}</Text>
+          <Text className="text-base leading-snug text-gray-500 dark:text-gray-400 mb-6">{message}</Text>
           <View className="flex-row gap-3">
             <TouchableOpacity
               onPress={onCancel}
-              className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-2xl py-3 items-center"
+              className="flex-1 bg-gray-100 dark:bg-neutral-700 rounded-xl py-2.5 items-center"
             >
-              <Text className="text-base font-semibold text-gray-700 dark:text-gray-300">
+              <Text className="text-lg font-medium text-gray-700 dark:text-gray-300">
                 {cancelText}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={onConfirm}
-              className={`flex-1 rounded-2xl py-3 items-center ${
+              className={`flex-1 rounded-xl py-2.5 items-center ${
                 destructive ? 'bg-red-500' : 'bg-primary'
               }`}
             >
-              <Text className="text-base font-semibold text-white">{confirmText}</Text>
+              <Text className="text-lg font-medium text-white">{confirmText}</Text>
             </TouchableOpacity>
           </View>
         </Pressable>

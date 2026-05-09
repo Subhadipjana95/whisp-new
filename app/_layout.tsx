@@ -22,7 +22,14 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    setupNotifications();
+    const init = async () => {
+      try {
+        await setupNotifications();
+      } catch (err) {
+        console.error('[RootLayout] setupNotifications failed:', err);
+      }
+    };
+    init();
 
     const actionSub = Notifications.addNotificationResponseReceivedListener(async (response) => {
       const { actionIdentifier, notification } = response;

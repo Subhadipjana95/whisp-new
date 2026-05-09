@@ -1,18 +1,17 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Modal,
   Pressable,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { BlurView } from 'expo-blur';
-import { Ionicons } from '@expo/vector-icons';
 import { useRecorder } from '../hooks/useRecorder';
-import { RecorderWheel } from './RecorderWheel';
 import { transcribeAudio } from '../services/transcription';
+import { RecorderWheel } from './RecorderWheel';
 
 interface VoiceRecorderModalProps {
   visible: boolean;
@@ -101,22 +100,21 @@ export function VoiceRecorderModal({ visible, onClose, onTranscript }: VoiceReco
   const showControls = isRecordingActive || isPaused;
 
   return (
-    <Modal transparent animationType="slide" visible={visible} onRequestClose={onClose}>
-      <Pressable className="flex-1 justify-end" onPress={() => {}}>
-        <View className="absolute inset-0 bg-black/80" />
-        <View className="bg-surface-1 rounded-t-xl p-8 pb-12 items-center border-t border-hairline">
+    <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
+      <Pressable className="flex-1 bg-black/70 items-center justify-end pb-12 px-8" onPress={() => { }}>
+        <Pressable className="bg-white dark:bg-neutral-900 rounded-xl px-6 pb-6 pt-4 w-full max-w-sm border border-white/10 items-center">
           {/* Header */}
-          <View className="flex-row items-center justify-between w-full mb-8">
-            <Text className="text-2xl font-bold text-ink">
+          <View className="flex-row items-center justify-between w-full mb-6">
+            <Text className="text-xl font-medium text-gray-900 dark:text-white/50">
               {uiState === 'ready'
                 ? 'Voice Note'
                 : uiState === 'transcribing'
-                ? 'Transcribing...'
-                : uiState === 'error'
-                ? 'Error'
-                : 'Recording'}
+                  ? 'Transcribing...'
+                  : uiState === 'error'
+                    ? 'Error'
+                    : 'Recording'}
             </Text>
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity onPress={onClose} className='bg-white/10 p-1 rounded-full border border-white/10'>
               <Ionicons name="close" size={24} color="#8a8f98" />
             </TouchableOpacity>
           </View>
@@ -128,14 +126,14 @@ export function VoiceRecorderModal({ visible, onClose, onTranscript }: VoiceReco
               <Text className="text-sm text-ink-subtle mt-4">Converting to text...</Text>
             </View>
           ) : uiState === 'error' ? (
-            <View className="w-full items-center py-8">
+            <View className="w-full items-center py-4">
               <Ionicons name="warning-outline" size={48} color="#ef4444" />
               <Text className="text-base text-red-500 text-center mt-4">{errorMsg}</Text>
               <TouchableOpacity
-                className="mt-6 bg-primary rounded-md px-6 py-3"
+                className="mt-6 bg-primary rounded-xl px-8 py-2.5"
                 onPress={() => setUiState('ready')}
               >
-                <Text className="text-ink font-medium">Try Again</Text>
+                <Text className="text-white font-medium">Try Again</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -144,30 +142,30 @@ export function VoiceRecorderModal({ visible, onClose, onTranscript }: VoiceReco
 
           {/* Duration */}
           {showControls && (
-            <Text className="text-4xl font-mono text-ink mt-6">
+            <Text className="text-3xl font-mono text-gray-900 dark:text-white mt-6">
               {formatDuration(durationMs)}
             </Text>
           )}
 
           {/* Status text */}
           {uiState === 'ready' && (
-            <Text className="text-base text-ink-subtle mt-4 text-center">
-              Tap the button below to start recording
+            <Text className="text-base text-gray-500 dark:text-gray-400 mt-4 text-center">
+              Tap below to start recording
             </Text>
           )}
           {isPaused && (
-            <Text className="text-sm text-ink-subtle mt-2">Paused — tap resume to continue</Text>
+            <Text className="text-sm text-gray-500 dark:text-gray-400 mt-2">Paused — tap resume to continue</Text>
           )}
 
           {/* Action Buttons */}
-          <View className="flex-row gap-4 mt-8 w-full">
+          <View className="flex-row gap-3 mt-8 w-full">
             {uiState === 'ready' && (
               <TouchableOpacity
                 onPress={handleStartRecording}
-                className="flex-1 bg-primary rounded-md py-3 items-center flex-row justify-center gap-2"
+                className="flex-1 bg-primary rounded-xl py-3 items-center flex-row justify-center gap-2"
               >
-                <Ionicons name="mic" size={20} color="#f7f8f8" />
-                <Text className="text-ink font-medium">Start Recording</Text>
+                <Ionicons name="mic" size={20} color="#fff" />
+                <Text className="text-white font-medium text-lg">Start</Text>
               </TouchableOpacity>
             )}
 
@@ -175,37 +173,36 @@ export function VoiceRecorderModal({ visible, onClose, onTranscript }: VoiceReco
               <>
                 <TouchableOpacity
                   onPress={handleDiscard}
-                  className="flex-1 bg-surface-2 border border-hairline rounded-md py-3 items-center flex-row justify-center gap-2"
+                  className="bg-gray-100 dark:bg-neutral-800 rounded-xl p-3 items-center justify-center"
                 >
-                  <Ionicons name="trash-outline" size={20} color="#ef4444" />
-                  <Text className="text-red-500 font-medium">Discard</Text>
+                  <Ionicons name="trash-outline" size={22} color="#ef4444" />
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={handlePause}
-                  className="flex-1 bg-surface-2 border border-hairline rounded-md py-3 items-center flex-row justify-center gap-2"
+                  className="flex-1 bg-gray-100 dark:bg-neutral-800 rounded-xl py-3 items-center flex-row justify-center gap-2"
                 >
                   <Ionicons
                     name={isRecordingActive ? 'pause' : 'play'}
                     size={20}
                     color="#5e6ad2"
                   />
-                  <Text className="text-primary font-medium">
+                  <Text className="text-primary font-medium text-lg">
                     {isRecordingActive ? 'Pause' : 'Resume'}
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={handleConvert}
-                  className="flex-1 bg-primary rounded-md py-3 items-center flex-row justify-center gap-2"
+                  className="flex-1 bg-primary rounded-xl py-3 items-center flex-row justify-center gap-2"
                 >
-                  <Ionicons name="sparkles" size={20} color="#f7f8f8" />
-                  <Text className="text-ink font-medium">Convert</Text>
+                  <Ionicons name="sparkles" size={20} color="#fff" />
+                  <Text className="text-white font-medium text-lg">Done</Text>
                 </TouchableOpacity>
               </>
             )}
           </View>
-        </View>
+        </Pressable>
       </Pressable>
     </Modal>
   );

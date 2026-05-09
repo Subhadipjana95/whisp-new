@@ -55,7 +55,7 @@ whisp/
 ### 2. Installation
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/whisp.git
+git clone https://github.com/Subhadipjana95/whisp-new.git
 cd whisp
 
 # Install dependencies

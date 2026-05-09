@@ -16,8 +16,7 @@ export const SearchBar = memo(function SearchBar({
   placeholder = 'Search notes and reminders...',
 }: SearchBarProps) {
   return (
-    <View className="flex-row items-center bg-surface-1 rounded-md px-3 py-2 mx-4 mb-4 border border-hairline focus:border-hairline-strong">
-      <Ionicons name="search" size={16} color="#8a8f98" />
+    <View className="flex-row items-center bg-surface-1 rounded-full px-3  py-1.5 mx-4 mb-4 border border-hairline focus:border-hairline-strong">
       <TextInput
         className="flex-1 ml-2 text-base text-ink"
         value={value}
@@ -30,8 +29,8 @@ export const SearchBar = memo(function SearchBar({
         clearButtonMode="never"
       />
       {value.length > 0 && (
-        <TouchableOpacity onPress={onClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <Ionicons name="close-circle" size={16} color="#8a8f98" />
+        <TouchableOpacity onPress={onClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} className='bg-white/10 p-1.5 rounded-full items-center justify-center'>
+          <Ionicons name="close-circle-outline" size={22} color="#8a8f98" />
         </TouchableOpacity>
       )}
     </View>

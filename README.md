@@ -1,50 +1,88 @@
-# Welcome to your Expo app 👋
+# Whisp (NoteVoice) 🎙️
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Whisp is a premium, local-first voice note and reminder application built with React Native and Expo. It leverages AI to transcribe voice recordings and intelligently categorize them into notes or reminders based on context.
 
-## Get started
+## ✨ Features
 
-1. Install dependencies
+- **AI-Powered Transcription**: Converts voice recordings to text using OpenAI's Whisper API.
+- **Smart Parsing**: Uses Anthropic's Claude API to detect intent—automatically creating a **Note** or a **Reminder** with due dates.
+- **Local-First Architecture**: High-performance storage using SQLite and Drizzle ORM.
+- **Smart Reminders**: Integrated with `expo-notifications` for timely alerts with action buttons (Done, Snooze).
+- **Attachments**: Support for photos, documents, and audio clips attached to any record.
+- **Premium UI/UX**: Modern dark-mode interface inspired by Linear, featuring smooth Reanimated transitions and glassmorphism.
+- **Theming**: Reactive Light, Dark, and System theme switching.
+- **Privacy-First**: All data stays on your device. API keys are stored locally via MMKV.
 
-   ```bash
-   npm install
-   ```
+## 🚀 Tech Stack
 
-2. Start the app
+- **Framework**: [Expo](https://expo.dev/) (SDK 54+) with Expo Router v3
+- **Database**: [Drizzle ORM](https://orm.drizzle.team/) + [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Styling**: [NativeWind](https://www.nativewind.dev/) (Tailwind CSS for React Native)
+- **Animations**: [React Native Reanimated](https://www.react-native-reanimated.org/)
+- **AI Services**: OpenAI (Whisper), Anthropic (Claude)
+- **Persistence**: [react-native-mmkv](https://github.com/mrousavy/react-native-mmkv)
 
-   ```bash
-   npx expo start
-   ```
+## 📦 Project Structure
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```text
+whisp/
+├── app/                  # Expo Router file-based navigation
+│   ├── _layout.tsx       # Root layout, providers & listeners
+│   ├── index.tsx         # Dashboard (unified notes + reminders)
+│   ├── settings.tsx      # App settings & API configuration
+│   ├── note/[id].tsx     # Note detail & editing
+│   └── reminder/[id].tsx # Reminder detail & scheduling
+├── src/
+│   ├── components/       # Reusable UI (Cards, Modals, Loaders)
+│   ├── db/               # Database schema & migrations
+│   ├── hooks/            # Custom hooks (Recorder, Search, Theme)
+│   ├── services/         # Business logic (AI, Notifications, Files)
+│   ├── stores/           # Zustand state management
+│   ├── types/            # TypeScript interfaces
+│   ├── constants/        # App-wide constants
+│   └── theme/            # Design tokens
+└── assets/               # Static assets & sounds
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🛠️ Getting Started
 
-## Learn more
+### 1. Prerequisites
+- [Node.js](https://nodejs.org/) (v18+)
+- [Bun](https://bun.sh/) (recommended) or npm
+- [Expo Go](https://expo.dev/client) app on your mobile device (or an emulator)
 
-To learn more about developing your project with Expo, look at the following resources:
+### 2. Installation
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/whisp.git
+cd whisp
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+# Install dependencies
+bun install
+```
 
-## Join the community
+### 3. Environment Variables
+Create a `.env` file in the root directory:
+```env
+EXPO_PUBLIC_OPENAI_API_KEY=your_openai_key_here
+EXPO_PUBLIC_ANTHROPIC_API_KEY=your_anthropic_key_here
+```
+*Note: You can also configure these keys directly in the app's Settings screen.*
 
-Join our community of developers creating universal apps.
+### 4. Running the App
+```bash
+# Start the development server
+bun start
+```
+Scan the QR code with your camera (iOS) or Expo Go app (Android) to launch.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 💾 Database Migrations
+If you modify the database schema in `src/db/schema.ts`, generate a new migration:
+```bash
+npx drizzle-kit generate
+```
+
+### Contributions
+
+Built and Developer by [@Subhadip95](https://a063.xyz) 💚 2026

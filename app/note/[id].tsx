@@ -54,18 +54,22 @@ export default function NoteScreen() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerTitle: '',
       headerRight: () => (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginRight: 16 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginRight: 16 }}>
+          {!isNew && existingNote && (
+            <AttachmentPicker parentId={existingNote.id} parentType="note" mode="minimal" />
+          )}
           {!isNew && (
             <TouchableOpacity onPress={() => {
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
               setShowDeleteDialog(true);
-            }}>
+            }} className='bg-neutral-400 dark:bg-neutral-800 px-2 py-2 rounded-lg border border-white/5'>
               <Ionicons name="trash-outline" size={22} color="#ef4444" />
             </TouchableOpacity>
           )}
           {isDirty && (
-            <TouchableOpacity onPress={handleSave} disabled={isSaving}>
+            <TouchableOpacity onPress={handleSave} disabled={isSaving} className='bg-neutral-400 dark:bg-neutral-800 px-2 py-2 rounded-lg border border-white/5'>
               <Text style={{ color: '#5e6ad2', fontWeight: '600', fontSize: 16 }}>
                 {isSaving ? 'Saving...' : 'Save'}
               </Text>
@@ -81,28 +85,25 @@ export default function NoteScreen() {
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView className="flex-1 px-4" keyboardDismissMode="interactive" showsVerticalScrollIndicator={false}>
           <TextInput
-            className="text-2xl font-bold text-ink mt-4 mb-2"
+            className="text-4xl font-medium text-white/70"
             value={title} onChangeText={handleTitleChange}
             placeholder="Title" placeholderTextColor="#8a8f98" multiline returnKeyType="next"
           />
           {existingNote && (
-            <Text className="text-xs text-ink-subtle mb-4">
-              Last edited {format(existingNote.updatedAt, 'MMM d, yyyy · h:mm a')}
+            <Text className="text-xs text-ink-subtle mb-4 ml-2 -mt-2">
+              {format(existingNote.updatedAt, 'MMM d, yyyy · h:mm a')}
             </Text>
           )}
           <TextInput
-            className="text-base text-ink-subtle leading-relaxed min-h-48"
+            className="text-lg text-ink-subtle leading-relaxed min-h-[300px] bg-surface-1 rounded-xl px-6 py-3 border border-white/5 mb-12"
             value={body} onChangeText={handleBodyChange}
             placeholder="Start writing your note..." placeholderTextColor="#8a8f98"
             multiline textAlignVertical="top"
           />
           {existingNote && (
-            <>
-              <AttachmentPreview attachments={existingNote.attachments} parentId={existingNote.id} parentType="note" />
-              <AttachmentPicker parentId={existingNote.id} parentType="note" />
-            </>
+            <AttachmentPreview attachments={existingNote.attachments} parentId={existingNote.id} parentType="note" />
           )}
-          <View className="h-8" />
+          <View className="h-4" />
         </ScrollView>
       </KeyboardAvoidingView>
       <ConfirmDialog

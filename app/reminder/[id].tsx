@@ -72,10 +72,21 @@ export default function ReminderScreen() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerTitle: '',
       headerRight: () => (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginRight: 16 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginRight: 16 }}>
+          {!isNew && existingReminder && (
+            <AttachmentPicker parentId={existingReminder.id} parentType="reminder" mode="minimal" />
+          )}
+          {isDirty && (
+            <TouchableOpacity onPress={handleSave} disabled={isSaving} className='bg-neutral-400 dark:bg-neutral-800 p-2 rounded-lg border border-white/5'>
+              <Text style={{ color: '#5e6ad2', fontWeight: '600', fontSize: 16 }}>
+                {isSaving ? 'Saving...' : 'Save'}
+              </Text>
+            </TouchableOpacity>
+          )}
           {!isNew && existingReminder && !existingReminder.isDone && (
-            <TouchableOpacity onPress={() => markDone(existingReminder.id)}>
+            <TouchableOpacity onPress={() => markDone(existingReminder.id)} className='bg-neutral-400 dark:bg-neutral-800 p-2 rounded-lg border border-white/5'>
               <Ionicons name="checkmark-circle-outline" size={24} color="#22c55e" />
             </TouchableOpacity>
           )}
@@ -83,15 +94,8 @@ export default function ReminderScreen() {
             <TouchableOpacity onPress={() => {
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
               setShowDeleteDialog(true);
-            }}>
+            }} className='bg-neutral-400 dark:bg-neutral-800 p-2 rounded-lg border border-white/5'>
               <Ionicons name="trash-outline" size={22} color="#ef4444" />
-            </TouchableOpacity>
-          )}
-          {isDirty && (
-            <TouchableOpacity onPress={handleSave} disabled={isSaving}>
-              <Text style={{ color: '#5e6ad2', fontWeight: '600', fontSize: 16 }}>
-                {isSaving ? 'Saving...' : 'Save'}
-              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -106,9 +110,10 @@ export default function ReminderScreen() {
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView className={`flex-1 px-4 ${isDone ? 'opacity-60' : ''}`} keyboardDismissMode="interactive" showsVerticalScrollIndicator={false}>
           <TextInput
-            className="text-2xl font-bold text-ink mt-4 mb-2"
+            className="text-4xl font-medium text-white/70"
             value={title} onChangeText={(t) => { setTitle(sanitize(t)); setIsDirty(true); }}
             placeholder="Reminder title" placeholderTextColor="#8a8f98" editable={!isDone}
+            multiline
           />
           {isDone && (
             <View className="flex-row items-center gap-2 bg-surface-2 border border-hairline rounded-md p-3 mb-4">
@@ -118,15 +123,12 @@ export default function ReminderScreen() {
           )}
           <DateTimePicker value={dueAt} onChange={(d) => { setDueAt(d); setIsDirty(true); }} label="Due" />
           <TextInput
-            className="text-base text-ink-subtle leading-relaxed min-h-32 mt-4"
+            className="text-lg text-ink-subtle leading-relaxed min-h-[300px] bg-surface-1 rounded-xl px-6 py-3 border border-white/5 mb-12"
             value={body} onChangeText={(t) => { setBody(sanitize(t)); setIsDirty(true); }}
             placeholder="Add notes..." placeholderTextColor="#8a8f98" multiline textAlignVertical="top" editable={!isDone}
           />
           {existingReminder && (
-            <>
-              <AttachmentPreview attachments={existingReminder.attachments} parentId={existingReminder.id} parentType="reminder" />
-              <AttachmentPicker parentId={existingReminder.id} parentType="reminder" />
-            </>
+            <AttachmentPreview attachments={existingReminder.attachments} parentId={existingReminder.id} parentType="reminder" />
           )}
           <View className="h-8" />
         </ScrollView>

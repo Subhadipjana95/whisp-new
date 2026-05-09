@@ -1,4 +1,4 @@
-import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, ActionSheetIOS, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
@@ -9,16 +9,20 @@ import { useRemindersStore } from '../stores/remindersStore';
 import type { ParentType } from '../types';
 import { MAX_ATTACHMENT_SIZE_BYTES } from '../constants';
 import uuid from 'react-native-uuid';
+import { AttachmentOptionsDialog } from './AttachmentOptionsDialog';
 
 interface AttachmentPickerProps {
   parentId: string;
   parentType: ParentType;
+  mode?: 'full' | 'minimal';
 }
 
 export const AttachmentPicker = memo(function AttachmentPicker({
   parentId,
   parentType,
+  mode = 'full',
 }: AttachmentPickerProps) {
+  const [showOptions, setShowOptions] = useState(false);
   const addNoteAttachment = useNotesStore((s) => s.addAttachment);
   const addReminderAttachment = useRemindersStore((s) => s.addAttachment);
   const addAttachment = parentType === 'note' ? addNoteAttachment : addReminderAttachment;
@@ -96,6 +100,12 @@ export const AttachmentPicker = memo(function AttachmentPicker({
     }
   }, [parentId, parentType, addAttachment]);
 
+  const handleSelect = useCallback((type: 'camera' | 'library' | 'file') => {
+    if (type === 'camera') pickImage('camera');
+    else if (type === 'library') pickImage('library');
+    else if (type === 'file') pickFile();
+  }, [pickImage, pickFile]);
+
   const handlePress = useCallback(() => {
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
@@ -110,22 +120,38 @@ export const AttachmentPicker = memo(function AttachmentPicker({
         }
       );
     } else {
-      Alert.alert('Add Attachment', 'Choose attachment type:', [
-        { text: 'Take Photo', onPress: () => pickImage('camera') },
-        { text: 'Choose from Library', onPress: () => pickImage('library') },
-        { text: 'Choose File', onPress: pickFile },
-        { text: 'Cancel', style: 'cancel' },
-      ]);
+      setShowOptions(true);
     }
   }, [pickImage, pickFile]);
 
+  const renderPicker = () => {
+    if (mode === 'minimal') {
+      return (
+        <TouchableOpacity onPress={handlePress} className='bg-neutral-400 dark:bg-neutral-800 p-2 rounded-lg border border-white/5'>
+          <Ionicons name="attach" size={24} color="#8a8f98" />
+        </TouchableOpacity>
+      );
+    }
+
+    return (
+      <TouchableOpacity
+        onPress={handlePress}
+        className="flex-row items-center gap-2 py-3 border-t border-hairline mt-4"
+      >
+        <Ionicons name="attach" size={20} color="#5e6ad2" />
+        <Text className="text-base text-primary font-medium">Add Attachment</Text>
+      </TouchableOpacity>
+    );
+  };
+
   return (
-    <TouchableOpacity
-      onPress={handlePress}
-      className="flex-row items-center gap-2 py-3 border-t border-hairline mt-4"
-    >
-      <Ionicons name="attach" size={20} color="#5e6ad2" />
-      <Text className="text-base text-primary font-medium">Add Attachment</Text>
-    </TouchableOpacity>
+    <>
+      {renderPicker()}
+      <AttachmentOptionsDialog
+        visible={showOptions}
+        onClose={() => setShowOptions(false)}
+        onSelect={handleSelect}
+      />
+    </>
   );
 });

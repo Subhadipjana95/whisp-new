@@ -1,7 +1,9 @@
-import React, { memo, useState } from 'react';
-import { View, Text, TouchableOpacity, Platform, Modal } from 'react-native';
-import { format } from 'date-fns';
 import DateTimePickerNative from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
+import React, { memo, useState, useCallback } from 'react';
+import { Modal, Platform, Text, TouchableOpacity, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { useSettingsStore } from '../stores/settingsStore';
 
 interface DateTimePickerProps {
   value: Date;
@@ -17,8 +19,16 @@ export const DateTimePicker = memo(function DateTimePicker({
   const [showPicker, setShowPicker] = useState(false);
   const [mode, setMode] = useState<'date' | 'time'>('date');
   const [tempDate, setTempDate] = useState(value);
+  const hapticEnabled = useSettingsStore((s) => s.hapticFeedback);
+
+  const triggerHaptic = useCallback(() => {
+    if (hapticEnabled) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+  }, [hapticEnabled]);
 
   const handleOpen = (pickerMode: 'date' | 'time') => {
+    triggerHaptic();
     setMode(pickerMode);
     setTempDate(value);
     setShowPicker(true);
@@ -35,20 +45,19 @@ export const DateTimePicker = memo(function DateTimePicker({
   };
 
   const handleConfirm = () => {
+    triggerHaptic();
     onChange(tempDate);
     setShowPicker(false);
   };
 
   return (
-    <View className="flex-row items-center gap-3 py-3 border-b border-hairline">
-      <Text className="text-base text-ink-subtle w-12">{label}</Text>
-      <TouchableOpacity onPress={() => handleOpen('date')}>
+    <View className="flex-row items-center gap-2 mb-6">
+      <TouchableOpacity onPress={() => handleOpen('date')} className='bg-surface-2 px-3 py-1 rounded-full border border-white/5'>
         <Text className="text-base text-primary font-medium">
           {format(value, 'EEE, MMM d, yyyy')}
         </Text>
       </TouchableOpacity>
-      <Text className="text-gray-300">·</Text>
-      <TouchableOpacity onPress={() => handleOpen('time')}>
+      <TouchableOpacity onPress={() => handleOpen('time')} className='bg-surface-2 px-3 py-1 rounded-full border border-white/5'>
         <Text className="text-base text-primary font-medium">{format(value, 'h:mm a')}</Text>
       </TouchableOpacity>
 
@@ -70,6 +79,7 @@ export const DateTimePicker = memo(function DateTimePicker({
                 display="spinner"
                 onChange={handleChange}
                 minimumDate={new Date()}
+                themeVariant="dark"
               />
             </View>
           </View>
@@ -83,6 +93,7 @@ export const DateTimePicker = memo(function DateTimePicker({
           display="default"
           onChange={handleChange}
           minimumDate={new Date()}
+          themeVariant="dark"
         />
       )}
     </View>

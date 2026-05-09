@@ -1,23 +1,24 @@
-import React, { useEffect, useCallback, useState } from 'react';
-import { View, Text, SectionList, TouchableOpacity, Alert, RefreshControl } from 'react-native';
-import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useNotesStore } from '@/stores/notesStore';
-import { useRemindersStore } from '@/stores/remindersStore';
-import { SearchBar } from '@/components/SearchBar';
+import { EmptyState } from '@/components/EmptyState';
+import { FloatingActionBar } from '@/components/FloatingActionBar';
 import { NoteCard } from '@/components/NoteCard';
 import { ReminderCard } from '@/components/ReminderCard';
-import { FloatingActionBar } from '@/components/FloatingActionBar';
-import { EmptyState } from '@/components/EmptyState';
+import { SearchBar } from '@/components/SearchBar';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { VoiceRecorderModal } from '@/components/VoiceRecorderModal';
 import { useSearch } from '@/hooks/useSearch';
 import { parseTranscript } from '@/services/aiParser';
 import { scheduleReminder } from '@/services/notifications';
 import { requestAllPermissions } from '@/services/permissions';
+import { useNotesStore } from '@/stores/notesStore';
+import { useRemindersStore } from '@/stores/remindersStore';
 import type { Note, Reminder } from '@/types';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Alert, RefreshControl, SectionList, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { CreateOptionsDialog } from '@/components/CreateOptionsDialog';
 
 export default function MainScreen() {
   const { notes, fetchAll: fetchNotes, isLoading: notesLoading } = useNotesStore();
@@ -28,6 +29,7 @@ export default function MainScreen() {
   const { create: createNote } = useNotesStore();
   const { query, setQuery, filteredNotes, filteredReminders } = useSearch(notes, reminders);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const isLoading = notesLoading || remindersLoading;
 
   const loadAll = useCallback(async () => {
@@ -37,20 +39,19 @@ export default function MainScreen() {
   useEffect(() => { loadAll(); }, [loadAll]);
 
   useEffect(() => {
-    AsyncStorage.getItem('permissions_requested').then((requested) => {
-      if (!requested) {
-        requestAllPermissions().then(() => {
-          AsyncStorage.setItem('permissions_requested', 'true');
-        });
-      }
-    });
+    // Request permissions on mount to ensure features work
+    requestAllPermissions();
   }, []);
 
   const activeReminders = filteredReminders
     .filter((r) => !r.isDone)
     .sort((a, b) => a.dueAt - b.dueAt);
 
-  type SectionData = { title: string; data: (Note | Reminder)[]; type: 'note' | 'reminder' };
+  const completedReminders = filteredReminders
+    .filter((r) => r.isDone)
+    .sort((a, b) => b.updatedAt - a.updatedAt); // Newest completed first
+
+  type SectionData = { title: string; data: (Note | Reminder)[]; type: 'note' | 'reminder' | 'completed' };
   const sections: SectionData[] = [
     ...(activeReminders.length > 0
       ? [{ title: 'Reminders', data: activeReminders as (Note | Reminder)[], type: 'reminder' as const }]
@@ -58,14 +59,14 @@ export default function MainScreen() {
     ...(filteredNotes.length > 0
       ? [{ title: 'Notes', data: filteredNotes as (Note | Reminder)[], type: 'note' as const }]
       : []),
+    ...(completedReminders.length > 0
+      ? [{ title: 'Completed', data: completedReminders as (Note | Reminder)[], type: 'completed' as const }]
+      : []),
   ];
 
-  const handleAddPress = useCallback(() => {
-    Alert.alert('Create', 'What would you like to create?', [
-      { text: 'Note', onPress: () => router.push('/note/new' as any) },
-      { text: 'Reminder', onPress: () => router.push('/reminder/new' as any) },
-      { text: 'Cancel', style: 'cancel' },
-    ]);
+  const handleCreateSelect = useCallback((type: 'note' | 'reminder') => {
+    if (type === 'note') router.push('/note/new' as any);
+    else router.push('/reminder/new' as any);
   }, []);
 
   const handleTranscript = useCallback(async (transcript: string) => {
@@ -94,7 +95,7 @@ export default function MainScreen() {
 
   const renderItem = useCallback(
     ({ item, section }: { item: Note | Reminder; section: SectionData }) => {
-      if (section.type === 'reminder') {
+      if (section.type === 'reminder' || section.type === 'completed') {
         const reminder = item as Reminder;
         return (
           <ReminderCard
@@ -110,12 +111,24 @@ export default function MainScreen() {
     [markDone]
   );
 
-  const hasContent = notes.length > 0 || reminders.filter((r) => !r.isDone).length > 0;
+  const hasContent = notes.length > 0 || reminders.length > 0;
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas" edges={['top']}>
-      <View className="flex-row items-center justify-between px-6 pt-6 pb-4">
-        <Text className="text-3xl font-bold text-ink tracking-tight">Whisp</Text>
+    <SafeAreaView className="flex-1" edges={['top']}>
+      <View className="bg-canvas flex-row items-start justify-between px-6 pt-3 pb-4">
+        <View>
+          <View className="flex-row items-start justify-center bg-primary/10 w-20 border border-white/5 rounded-lg py-[1px]">
+            <Text className="text-xl font-medium text-primary tracking-relaxed">Whisp.</Text>
+          </View>
+
+          <View className="flex-row items-start justify-center gap-2">
+            <Text className="text-2xl font-medium text-white/70 tracking-relaxed leading-tighter">Make Your Day</Text>
+            <View className="flex-row items-start justify-center bg-primary/10 w-30 px-1.5 border border-white/5 rounded-lg py-[1px]">
+              <Text className="text-2xl font-medium text-primary tracking-relaxed leading-tighter">Productive</Text>
+            </View>
+          </View>
+
+        </View>
         <TouchableOpacity onPress={() => router.push('/settings')}>
           <Ionicons name="settings-outline" size={24} color="#8a8f98" />
         </TouchableOpacity>
@@ -136,16 +149,21 @@ export default function MainScreen() {
             </Text>
           )}
           stickySectionHeadersEnabled={false}
-          contentContainerStyle={{ paddingBottom: 16 }}
+          contentContainerStyle={{ paddingBottom: 90 }}
           refreshControl={<RefreshControl refreshing={isLoading} onRefresh={loadAll} tintColor="#5e6ad2" />}
           showsVerticalScrollIndicator={false}
         />
       )}
-      <FloatingActionBar onVoicePress={() => setIsVoiceModalOpen(true)} onAddPress={handleAddPress} />
+      <FloatingActionBar onVoicePress={() => setIsVoiceModalOpen(true)} onAddPress={() => setIsCreateModalOpen(true)} />
       <VoiceRecorderModal
         visible={isVoiceModalOpen}
         onClose={() => setIsVoiceModalOpen(false)}
         onTranscript={handleTranscript}
+      />
+      <CreateOptionsDialog
+        visible={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSelect={handleCreateSelect}
       />
     </SafeAreaView>
   );

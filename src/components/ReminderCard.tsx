@@ -30,10 +30,9 @@ export const ReminderCard = memo(function ReminderCard({
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={reminder.isDone ? 1 : 0.7}
-      disabled={reminder.isDone}
+      activeOpacity={0.7}
       accessibilityRole="button"
-      accessibilityLabel={`Reminder: ${reminder.title}`}
+      accessibilityLabel={`Reminder: ${reminder.title}${reminder.isDone ? ' (Completed)' : ''}`}
       accessibilityHint="Double tap to open reminder"
       className={`bg-surface-1 rounded-lg p-6 mx-4 mb-3 border ${
         reminder.isDone
@@ -44,7 +43,6 @@ export const ReminderCard = memo(function ReminderCard({
       <View className="flex-row items-start">
         <TouchableOpacity
           onPress={onMarkDone}
-          disabled={reminder.isDone}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           className="mr-3 mt-0.5"
           accessibilityRole="checkbox"
@@ -54,7 +52,7 @@ export const ReminderCard = memo(function ReminderCard({
           <Ionicons
             name={reminder.isDone ? 'checkmark-circle' : 'ellipse-outline'}
             size={22}
-            color={reminder.isDone ? '#27a644' : '#5e6ad2'}
+            color={reminder.isDone ? '#27a66f' : '#5e6ad2'}
           />
         </TouchableOpacity>
 
@@ -62,7 +60,7 @@ export const ReminderCard = memo(function ReminderCard({
           <Text
             className={`text-lg font-medium ${
               reminder.isDone
-                ? 'line-through text-ink-tertiary'
+                ? ' text-ink-muted line-through opacity-80'
                 : 'text-ink'
             }`}
             numberOfLines={1}

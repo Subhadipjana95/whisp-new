@@ -123,7 +123,7 @@ export default function ReminderScreen() {
           )}
           <DateTimePicker value={dueAt} onChange={(d) => { setDueAt(d); setIsDirty(true); }} label="Due" />
           <TextInput
-            className="text-lg text-ink-subtle leading-relaxed min-h-[300px] bg-surface-1 rounded-xl px-6 py-3 border border-white/5 mb-12"
+            className="text-lg text-ink-subtle leading-relaxed min-h-[240px] bg-surface-1 rounded-xl px-6 py-3 border border-white/5 mb-12"
             value={body} onChangeText={(t) => { setBody(sanitize(t)); setIsDirty(true); }}
             placeholder="Add notes..." placeholderTextColor="#8a8f98" multiline textAlignVertical="top" editable={!isDone}
           />

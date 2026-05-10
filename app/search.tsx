@@ -65,7 +65,7 @@ export default function SearchScreen() {
     <SafeAreaView className="flex-1 bg-canvas" edges={['top']}>
       <Stack.Screen options={{ headerShown: false }} />
       <View className="flex-row items-center px-4 pt-6">
-        <TouchableOpacity onPress={() => router.back()} className="mr-1 bg-surface-1 rounded-full px-2 py-1.5 border border-hairline">
+        <TouchableOpacity onPress={() => router.back()} className="mr-1 mb-1">
           <Ionicons name="arrow-back" size={26} color="#5a5a5a" />
         </TouchableOpacity>
         <View className="flex-1 mt-1.5">

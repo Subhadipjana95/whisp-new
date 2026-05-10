@@ -17,11 +17,11 @@ export const NoteCard = memo(function NoteCard({ note, onPress }: NoteCardProps)
       accessibilityRole="button"
       accessibilityLabel={`Note: ${note.title}`}
       accessibilityHint="Double tap to open note"
-      className="bg-surface-1 rounded-lg p-6 mx-4 mb-3 border border-hairline"
+      className="bg-surface-1 rounded-3xl p-6 mx-4 mb-3 border border-white/10"
     >
       <View className="flex-row items-start justify-between">
         <Text
-          className="text-lg font-medium text-ink flex-1 mr-2"
+          className="text-2xl font-medium text-ink flex-1 mr-2"
           numberOfLines={1}
         >
           {note.title || 'Untitled'}
@@ -33,7 +33,7 @@ export const NoteCard = memo(function NoteCard({ note, onPress }: NoteCardProps)
 
       {note.body ? (
         <Text
-          className="text-base text-ink-muted mt-2"
+          className="text-base leading-tight text-ink-muted mt-2"
           numberOfLines={2}
         >
           {note.body}
@@ -41,11 +41,13 @@ export const NoteCard = memo(function NoteCard({ note, onPress }: NoteCardProps)
       ) : null}
 
       <View className="flex-row items-center justify-between mt-4">
-        <Text className="text-sm text-ink-subtle">
+        <View className="flex-row items-center gap-1.5 bg-primary/10 px-3 py-[4px] rounded-full border border-white/10">
+        <Text className="text-xs text-ink-subtle">
           {format(note.updatedAt, 'MMM d, yyyy')}
         </Text>
+        </View>
         {note.attachments.length > 0 && (
-          <View className="flex-row items-center gap-1">
+          <View className="flex-row items-center gap-1 bg-primary/10 px-2 py-[2px] rounded-full border border-white/10">
             <Ionicons name="attach" size={14} color="#8a8f98" />
             <Text className="text-sm text-ink-subtle">{note.attachments.length}</Text>
           </View>

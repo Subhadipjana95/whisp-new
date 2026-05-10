@@ -115,7 +115,7 @@ export default function MainScreen() {
 
   return (
     <SafeAreaView className="flex-1" edges={['top']}>
-      <View className="bg-canvas flex-row items-start justify-between px-6 pt-3 pb-4">
+      <View className="bg-canvas flex-row items-start justify-between px-4 pt-3 pb-4">
         <View>
           <View className="flex-row items-start justify-center bg-primary/10 w-20 border border-white/5 rounded-lg py-[1px]">
             <Text className="text-xl font-medium text-primary tracking-relaxed">Whisp.</Text>
@@ -144,7 +144,7 @@ export default function MainScreen() {
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           renderSectionHeader={({ section }) => (
-            <Text className="text-xs font-semibold text-ink-subtle uppercase tracking-widest px-6 py-3">
+            <Text className="text-sm font-medium text-ink-subtle tracking-wide px-6 py-3">
               {section.title}
             </Text>
           )}

@@ -20,12 +20,14 @@ export const ReminderCard = memo(function ReminderCard({
   const isDueToday = isToday(dueDate);
 
   const timeColor = reminder.isDone
-    ? 'text-ink-tertiary'
+    ? 'text-ink-muted'
     : isOverdue
     ? 'text-red-500'
     : isDueToday
     ? 'text-ink-muted'
     : 'text-ink-subtle';
+
+  const iconColor = isOverdue ? '#ef4444' : reminder.isDone ? '#d0d6e0' : '#8a8f98';
 
   return (
     <TouchableOpacity
@@ -34,10 +36,10 @@ export const ReminderCard = memo(function ReminderCard({
       accessibilityRole="button"
       accessibilityLabel={`Reminder: ${reminder.title}${reminder.isDone ? ' (Completed)' : ''}`}
       accessibilityHint="Double tap to open reminder"
-      className={`bg-surface-1 rounded-lg p-6 mx-4 mb-3 border ${
+      className={`bg-surface-1 rounded-3xl px-4 py-6 mx-4 mb-3 border ${
         reminder.isDone
-          ? 'border-hairline opacity-50'
-          : 'border-hairline'
+          ? 'border-hairline opacity-70'
+          : 'border-white/10'
       }`}
     >
       <View className="flex-row items-start">
@@ -58,10 +60,10 @@ export const ReminderCard = memo(function ReminderCard({
 
         <View className="flex-1">
           <Text
-            className={`text-lg font-medium ${
+            className={` font-medium ${
               reminder.isDone
-                ? ' text-ink-muted line-through opacity-80'
-                : 'text-ink'
+                ? 'text-xl text-ink-muted line-through'
+                : 'text-white/70 text-2xl'
             }`}
             numberOfLines={1}
           >
@@ -70,18 +72,27 @@ export const ReminderCard = memo(function ReminderCard({
 
           {reminder.body ? (
             <Text
-              className="text-base text-ink-muted mt-2"
+              className="text-base text-ink-muted mt-2 leading-tight"
               numberOfLines={2}
             >
               {reminder.body}
             </Text>
           ) : null}
 
-          <View className="flex-row items-center mt-4 gap-1">
-            <Ionicons name="alarm-outline" size={14} color={isOverdue ? '#ef4444' : '#8a8f98'} />
-            <Text className={`text-sm ${timeColor}`}>
-              {format(dueDate, 'MMM d, yyyy · h:mm a')}
-            </Text>
+          <View className="flex-row items-center mt-4 gap-2">
+            <View className="flex-row items-center gap-1.5 bg-primary/10 px-3 py-[4px] rounded-full border border-white/10">
+              <Ionicons name="calendar-outline" size={12} color={iconColor} />
+              <Text className={`text-xs font-medium ${timeColor}`}>
+                {format(dueDate, 'MMM d, yyyy')}
+              </Text>
+            </View>
+
+            <View className="flex-row items-center gap-1.5 bg-primary/10 px-3 py-[4px] rounded-full border border-white/10">
+              <Ionicons name="time-outline" size={12} color={iconColor} />
+              <Text className={`text-xs font-medium ${timeColor}`}>
+                {format(dueDate, 'h:mm a')}
+              </Text>
+            </View>
           </View>
         </View>
       </View>

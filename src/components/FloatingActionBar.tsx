@@ -34,13 +34,13 @@ export const FloatingActionBar = memo(function FloatingActionBar({
       />
       <View
         style={{ marginBottom: insets.bottom + 12 }}
-        className="w-4/5 mx-auto rounded-xl flex-row items-center justify-center gap-3 p-2 bg-canvas/80 border border-white/10 shadow-2xl"
+        className="w-4/5 mx-auto rounded-[28px] flex-row items-center justify-center gap-2 p-2 bg-canvas/80 border border-white/10 shadow-2xl"
       >
         {/* Voice Button */}
         <TouchableOpacity
           onPress={handlePress(onVoicePress)}
           activeOpacity={0.8}
-          className="flex-1 items-center justify-center bg-primary rounded-md py-3 flex-row gap-2"
+          className="flex-1 items-center justify-center bg-primary rounded-3xl py-3 flex-row gap-2"
         >
           <Ionicons name="mic" size={20} color="#f7f8f8" />
           <Text className="text-ink font-medium text-sm">Voice</Text>
@@ -50,7 +50,7 @@ export const FloatingActionBar = memo(function FloatingActionBar({
         <TouchableOpacity
           onPress={handlePress(onAddPress)}
           activeOpacity={0.8}
-          className="flex-1 items-center justify-center bg-surface-1 border border-hairline rounded-md py-3 flex-row gap-2"
+          className="flex-1 items-center justify-center bg-surface-1 border border-hairline rounded-3xl py-3 flex-row gap-2"
         >
           <Ionicons name="add" size={20} color="#f7f8f8" />
           <Text className="text-ink font-medium text-sm">New</Text>

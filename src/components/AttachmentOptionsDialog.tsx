@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { Modal, View, Text, TouchableOpacity, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 interface AttachmentOptionsDialogProps {
   visible: boolean;
@@ -14,12 +15,16 @@ export const AttachmentOptionsDialog = memo(function AttachmentOptionsDialog({
   onSelect,
 }: AttachmentOptionsDialogProps) {
   return (
-    <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
-      <Pressable
+    <Modal transparent animationType="none" visible={visible} onRequestClose={onClose}>
+      <Animated.View 
+        entering={FadeIn.duration(150)}
         className="flex-1 bg-black/70 items-center justify-end pb-12 px-8"
-        onPress={onClose}
       >
-        <Pressable className="bg-white dark:bg-neutral-900 rounded-xl px-6 pb-6 pt-4 w-full max-w-sm border border-white/10">
+        <Pressable className="absolute inset-0" onPress={onClose} />
+        <Animated.View 
+          entering={FadeInDown.duration(150).springify().damping(25).mass(0.3)}
+          className="bg-white dark:bg-neutral-900 rounded-xl px-6 pb-6 pt-4 w-full max-w-sm border border-white/10"
+        >
           <View className="flex-row items-center justify-between w-full mb-6">
             <Text className="text-xl font-medium text-gray-900 dark:text-white">Add Attachment</Text>
             <TouchableOpacity onPress={onClose} className='bg-white/10 p-1 rounded-full border border-white/10'>
@@ -58,8 +63,8 @@ export const AttachmentOptionsDialog = memo(function AttachmentOptionsDialog({
               <Text className="text-base font-medium text-gray-900 dark:text-white">Choose File</Text>
             </TouchableOpacity>
           </View>
-        </Pressable>
-      </Pressable>
+        </Animated.View>
+      </Animated.View>
     </Modal>
   );
 });

@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { useRecorder } from '../hooks/useRecorder';
 import { transcribeAudio } from '../services/transcription';
 import { RecorderWheel } from './RecorderWheel';
@@ -100,9 +101,16 @@ export function VoiceRecorderModal({ visible, onClose, onTranscript }: VoiceReco
   const showControls = isRecordingActive || isPaused;
 
   return (
-    <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
-      <Pressable className="flex-1 bg-black/70 items-center justify-end pb-20 px-8" onPress={() => { }}>
-        <Pressable className="bg-white dark:bg-neutral-900 rounded-3xl px-6 pb-6 pt-4 w-full max-w-sm border border-white/10 items-center">
+    <Modal transparent animationType="none" visible={visible} onRequestClose={onClose}>
+      <Animated.View 
+        entering={FadeIn.duration(150)}
+        className="flex-1 bg-black/70 items-center justify-end pb-20 px-8"
+      >
+        <Pressable className="absolute inset-0" onPress={() => { }} />
+        <Animated.View 
+          entering={FadeInDown.duration(200).springify().damping(20).mass(0.5)}
+          className="bg-white dark:bg-neutral-900 rounded-3xl px-6 pb-6 pt-4 w-full max-w-sm border border-white/10 items-center"
+        >
           {/* Header */}
           <View className="flex-row items-center justify-between w-full mb-6">
             <Text className="text-xl font-medium text-gray-900 dark:text-white/50">
@@ -202,8 +210,8 @@ export function VoiceRecorderModal({ visible, onClose, onTranscript }: VoiceReco
               </>
             )}
           </View>
-        </Pressable>
-      </Pressable>
+        </Animated.View>
+      </Animated.View>
     </Modal>
   );
 }

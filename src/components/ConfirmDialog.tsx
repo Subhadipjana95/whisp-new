@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { Modal, View, Text, TouchableOpacity, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Pressable } from 'react-native';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 interface ConfirmDialogProps {
   visible: boolean;
@@ -23,12 +24,16 @@ export const ConfirmDialog = memo(function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   return (
-    <Modal transparent animationType="fade" visible={visible} onRequestClose={onCancel}>
-      <Pressable
+    <Modal transparent animationType="none" visible={visible} onRequestClose={onCancel}>
+      <Animated.View
+        entering={FadeIn.duration(150)}
         className="flex-1 bg-black/60 items-center justify-center px-8"
-        onPress={onCancel}
       >
-        <Pressable className="bg-white dark:bg-neutral-900 rounded-xl p-6 w-full max-w-sm border border-white/10">
+        <Pressable className="absolute inset-0" onPress={onCancel} />
+        <Animated.View 
+          entering={FadeInDown.duration(200).springify().damping(20).mass(0.5)}
+          className="bg-white dark:bg-neutral-900 rounded-xl p-6 w-full max-w-sm border border-white/10"
+        >
           <Text className="text-xl font-bold text-gray-900 dark:text-white mb-2">{title}</Text>
           <Text className="text-base leading-snug text-gray-500 dark:text-gray-400 mb-6">{message}</Text>
           <View className="flex-row gap-3">
@@ -49,8 +54,8 @@ export const ConfirmDialog = memo(function ConfirmDialog({
               <Text className="text-lg font-medium text-white">{confirmText}</Text>
             </TouchableOpacity>
           </View>
-        </Pressable>
-      </Pressable>
+        </Animated.View>
+      </Animated.View>
     </Modal>
   );
 });

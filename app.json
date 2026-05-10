@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "NoteVoice",
-    "slug": "notevoice",
+    "slug": "whisp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -40,7 +40,9 @@
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE",
         "USE_FULL_SCREEN_INTENT",
-        "POST_NOTIFICATIONS"
+        "POST_NOTIFICATIONS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
     "web": {
@@ -58,16 +60,23 @@
       ],
       [
         "expo-av",
-        { "microphonePermission": "NoteVoice needs microphone access to record voice notes." }
+        {
+          "microphonePermission": "NoteVoice needs microphone access to record voice notes."
+        }
       ],
       "expo-sqlite"
     ],
     "extra": {
-      "groqKey": "process.env.EXPO_PUBLIC_GROQ_API_KEY"
+      "groqKey": "process.env.EXPO_PUBLIC_GROQ_API_KEY",
+      "router": {},
+      "eas": {
+        "projectId": "5490a919-41e0-4f1d-b8e3-166bdf73c32c"
+      }
     },
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "owner": "subhadip95"
   }
 }

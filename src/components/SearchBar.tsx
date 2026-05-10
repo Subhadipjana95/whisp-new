@@ -16,7 +16,7 @@ export const SearchBar = memo(function SearchBar({
   placeholder = 'Search notes and reminders...',
 }: SearchBarProps) {
   return (
-    <View className="flex-row items-center bg-surface-1 rounded-full px-3  py-1.5 mx-4 mb-4 border border-hairline focus:border-hairline-strong">
+    <View className="flex-row items-center bg-surface-1 rounded-full px-3 py- mx-4 mb-4 border border-hairline focus:border-hairline-strong">
       <TextInput
         className="flex-1 ml-2 text-base text-ink"
         value={value}

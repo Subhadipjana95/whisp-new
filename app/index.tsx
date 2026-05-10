@@ -2,10 +2,8 @@ import { EmptyState } from '@/components/EmptyState';
 import { FloatingActionBar } from '@/components/FloatingActionBar';
 import { NoteCard } from '@/components/NoteCard';
 import { ReminderCard } from '@/components/ReminderCard';
-import { SearchBar } from '@/components/SearchBar';
 import { SkeletonLoader } from '@/components/SkeletonLoader';
 import { VoiceRecorderModal } from '@/components/VoiceRecorderModal';
-import { useSearch } from '@/hooks/useSearch';
 import { parseTranscript } from '@/services/aiParser';
 import { scheduleReminder } from '@/services/notifications';
 import { requestAllPermissions } from '@/services/permissions';
@@ -27,7 +25,6 @@ export default function MainScreen() {
     create: createReminder, update: updateReminder,
   } = useRemindersStore();
   const { create: createNote } = useNotesStore();
-  const { query, setQuery, filteredNotes, filteredReminders } = useSearch(notes, reminders);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const isLoading = notesLoading || remindersLoading;
@@ -43,11 +40,11 @@ export default function MainScreen() {
     requestAllPermissions();
   }, []);
 
-  const activeReminders = filteredReminders
+  const activeReminders = reminders
     .filter((r) => !r.isDone)
     .sort((a, b) => a.dueAt - b.dueAt);
 
-  const completedReminders = filteredReminders
+  const completedReminders = reminders
     .filter((r) => r.isDone)
     .sort((a, b) => b.updatedAt - a.updatedAt); // Newest completed first
 
@@ -56,8 +53,8 @@ export default function MainScreen() {
     ...(activeReminders.length > 0
       ? [{ title: 'Reminders', data: activeReminders as (Note | Reminder)[], type: 'reminder' as const }]
       : []),
-    ...(filteredNotes.length > 0
-      ? [{ title: 'Notes', data: filteredNotes as (Note | Reminder)[], type: 'note' as const }]
+    ...(notes.length > 0
+      ? [{ title: 'Notes', data: notes as (Note | Reminder)[], type: 'note' as const }]
       : []),
     ...(completedReminders.length > 0
       ? [{ title: 'Completed', data: completedReminders as (Note | Reminder)[], type: 'completed' as const }]
@@ -129,11 +126,15 @@ export default function MainScreen() {
           </View>
 
         </View>
-        <TouchableOpacity onPress={() => router.push('/settings')}>
-          <Ionicons name="settings-outline" size={24} color="#8a8f98" />
-        </TouchableOpacity>
+        <View className="flex-row items-center gap-6">
+          <TouchableOpacity onPress={() => router.push('/search')}>
+            <Ionicons name="search-outline" size={28} color="#8a8f98" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/settings')}>
+            <Ionicons name="settings-outline" size={28} color="#8a8f98" />
+          </TouchableOpacity>
+        </View>
       </View>
-      <SearchBar value={query} onChangeText={setQuery} onClear={() => setQuery('')} />
       {isLoading && !hasContent ? (
         <SkeletonLoader count={4} />
       ) : !hasContent ? (

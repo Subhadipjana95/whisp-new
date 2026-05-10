@@ -4,6 +4,7 @@ import { db } from '../db';
 import { reminders, attachments } from '../db/schema';
 import type { Reminder, Attachment } from '../types';
 import uuid from 'react-native-uuid';
+import { cancelNotification } from '../services/notifications';
 
 interface RemindersState {
   reminders: Reminder[];
@@ -93,19 +94,28 @@ export const useRemindersStore = create<RemindersState>((set, get) => ({
 
   markDone: async (id) => {
     const now = Date.now();
+    const reminder = get().reminders.find((r) => r.id === id);
+    if (reminder?.notificationId) {
+      await cancelNotification(reminder.notificationId);
+    }
+
     await db
       .update(reminders)
-      .set({ isDone: true, updatedAt: now })
+      .set({ isDone: true, updatedAt: now, notificationId: null })
       .where(eq(reminders.id, id));
 
     set((state) => ({
       reminders: state.reminders.map((r) =>
-        r.id === id ? { ...r, isDone: true, updatedAt: now } : r
+        r.id === id ? { ...r, isDone: true, updatedAt: now, notificationId: null } : r
       ),
     }));
   },
 
   delete: async (id) => {
+    const reminder = get().reminders.find((r) => r.id === id);
+    if (reminder?.notificationId) {
+      await cancelNotification(reminder.notificationId);
+    }
     await db.delete(attachments).where(eq(attachments.parentId, id));
     await db.delete(reminders).where(eq(reminders.id, id));
     set((state) => ({ reminders: state.reminders.filter((r) => r.id !== id) }));

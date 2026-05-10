@@ -39,6 +39,7 @@ export default function RootLayout() {
 
       if (actionIdentifier === 'MARK_DONE') {
         await useRemindersStore.getState().markDone(reminderId);
+        await Notifications.dismissNotificationAsync(notification.request.identifier);
       } else if (actionIdentifier === 'SNOOZE') {
         const reminders = useRemindersStore.getState().reminders;
         const reminder = reminders.find((r) => r.id === reminderId);
@@ -49,6 +50,7 @@ export default function RootLayout() {
             dueAt: Date.now() + 10 * 60 * 1000,
           });
           await useRemindersStore.getState().update(reminderId, { notificationId: newId });
+          await Notifications.dismissNotificationAsync(notification.request.identifier);
         }
       } else if (actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER) {
         router.push(`/reminder/${reminderId}` as any);
